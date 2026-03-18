@@ -18,7 +18,7 @@ const router = Router();
 router.get('/', (_req, res) => {
   try {
     const weeks = db.prepare(
-      'SELECT * FROM weeks ORDER BY id ASC'
+      'SELECT * FROM weeks ORDER BY week_label ASC'
     ).all();
     res.json({ success: true, data: weeks });
   } catch (err: any) {
@@ -127,12 +127,12 @@ router.put('/:label', (req, res) => {
 
     // Get previous week for comparison
     const previousWeek = db.prepare(
-      'SELECT * FROM weeks WHERE id < (SELECT id FROM weeks WHERE week_label = ?) ORDER BY id DESC LIMIT 1'
+      'SELECT * FROM weeks WHERE week_label < ? ORDER BY week_label DESC LIMIT 1'
     ).get(label) as any | undefined;
 
     // Get 4-week rolling average
     const recentWeeks = db.prepare(
-      'SELECT * FROM weeks WHERE id <= (SELECT id FROM weeks WHERE week_label = ?) ORDER BY id DESC LIMIT 4'
+      'SELECT * FROM weeks WHERE week_label <= ? ORDER BY week_label DESC LIMIT 4'
     ).all(label) as any[];
 
     let fourWeekAvg: Partial<any> | null = null;

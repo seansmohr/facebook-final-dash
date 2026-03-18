@@ -31,7 +31,7 @@ router.get('/', (_req, res) => {
 router.get('/latest', (_req, res) => {
   try {
     const latestWeek = db.prepare(
-      'SELECT * FROM weeks WHERE spend IS NOT NULL ORDER BY id DESC LIMIT 1'
+      'SELECT * FROM weeks WHERE spend IS NOT NULL ORDER BY week_label DESC LIMIT 1'
     ).get() as any;
 
     if (!latestWeek) {
@@ -39,12 +39,12 @@ router.get('/latest', (_req, res) => {
     }
 
     const previousWeek = db.prepare(
-      'SELECT * FROM weeks WHERE id < ? ORDER BY id DESC LIMIT 1'
-    ).get(latestWeek.id) as any | undefined;
+      'SELECT * FROM weeks WHERE week_label < ? ORDER BY week_label DESC LIMIT 1'
+    ).get(latestWeek.week_label) as any | undefined;
 
     const recentWeeks = db.prepare(
-      'SELECT * FROM weeks WHERE id <= ? ORDER BY id DESC LIMIT 4'
-    ).all(latestWeek.id) as any[];
+      'SELECT * FROM weeks WHERE week_label <= ? ORDER BY week_label DESC LIMIT 4'
+    ).all(latestWeek.week_label) as any[];
 
     let fourWeekAvg: Partial<any> | null = null;
     if (recentWeeks.length >= 2) {
@@ -95,12 +95,12 @@ router.get('/:label', (req, res) => {
     }
 
     const previousWeek = db.prepare(
-      'SELECT * FROM weeks WHERE id < ? ORDER BY id DESC LIMIT 1'
-    ).get(week.id) as any | undefined;
+      'SELECT * FROM weeks WHERE week_label < ? ORDER BY week_label DESC LIMIT 1'
+    ).get(week.week_label) as any | undefined;
 
     const recentWeeks = db.prepare(
-      'SELECT * FROM weeks WHERE id <= ? ORDER BY id DESC LIMIT 4'
-    ).all(week.id) as any[];
+      'SELECT * FROM weeks WHERE week_label <= ? ORDER BY week_label DESC LIMIT 4'
+    ).all(week.week_label) as any[];
 
     let fourWeekAvg: Partial<any> | null = null;
     if (recentWeeks.length >= 2) {
